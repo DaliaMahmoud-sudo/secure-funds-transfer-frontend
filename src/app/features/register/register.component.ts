@@ -15,13 +15,8 @@ export class RegisterComponent {
   private readonly authService=inject(AuthService);
   private readonly router=inject(Router);
   registerForm: FormGroup = new FormGroup({
-    name: new FormControl("", [Validators.required , Validators.minLength(3) , Validators.maxLength(20)]),
-    username: new FormControl(""),
-    email: new FormControl("", [Validators.required , Validators.email]),
-    dateOfBirth: new FormControl("", Validators.required),
-    gender : new FormControl("", Validators.required),
-    password: new FormControl("", [Validators.required , Validators.pattern(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/)]),
-    rePassword: new FormControl("", Validators.required)
+    username: new FormControl("", [Validators.required , Validators.minLength(3) , Validators.maxLength(20)]),
+    password: new FormControl("", [Validators.required , Validators.pattern(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/)])
   });
 
   errorMsg:string="";
@@ -33,13 +28,14 @@ export class RegisterComponent {
     this.loading=true;
     this.registersubscribe.unsubscribe();
       this.registersubscribe= this.authService.signUp(this.registerForm.value).subscribe({
-        next:(response) =>{
-          console.log(response);
-          this.router.navigate(["/login"]);
-        },
-        error:(error:HttpErrorResponse)=>{
-         this.errorMsg=error.error.message;
-       },complete:()=>{
+        next: (response: any) => {
+    console.log(response);
+    this.router.navigate(['/login']);
+},
+       error: (error: HttpErrorResponse) => {
+    this.errorMsg = error.error?.message || 'Registration failed';
+    alert(this.errorMsg);      // show error message
+},complete:()=>{
         this.loading=false;
        }
       })

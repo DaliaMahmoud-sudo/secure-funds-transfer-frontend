@@ -10,7 +10,7 @@ import { environment } from '../../../../../environments/environment';
 export class AuthService {
   private readonly httpClient=inject(HttpClient);
   signUp(data:object):Observable<any>{
-    return this.httpClient.post(environment.baseUrl + "/users/signup",data)}
+    return this.httpClient.post(environment.baseUrl + "/auth/register",data)}
   signIn(data:object):Observable<any>
   {
     return this.httpClient.post(environment.baseUrl + "/auth/login",data)}

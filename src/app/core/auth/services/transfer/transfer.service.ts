@@ -11,4 +11,9 @@ export class TransferService {
  transfer(data:object){
   return this.httpClient.post(environment.baseUrl + "/transfers", data, { responseType: 'text' });
 }
+ transaction(){
+  return this.httpClient.get(environment.baseUrl + "/transactions");
+
+ }
+
 }
