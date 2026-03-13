@@ -1,42 +1,31 @@
-import { Component, OnInit } from '@angular/core';
-import { FormControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { RouterLink } from '@angular/router';
-import { TransferService } from '../../core/auth/services/transfer/transfer.service';
-import { AccServiceService } from '../../core/auth/services/account/acc-service.service';
-import { ChangeDetectorRef } from '@angular/core';
-import { DatePipe, NgClass } from '@angular/common';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Account } from '../../core/models/account.interface';
 import { Transaction } from '../../core/models/transaction.interface';
-
-
-
+import { AccountCardComponent } from "./components/account-card/account-card.component";
+import { DashboardHeaderComponent } from "./components/dashboard-header/dashboard-header.component";
+import { TransactionHistoryComponent } from "./components/transaction-history/transaction-history.component";
+import { TransferModalComponent } from "./components/transfer-modal/transfer-modal.component";
+import { TransferService } from '../../core/services/transfer/transfer.service';
+import { AccServiceService } from '../../core/services/account/acc-service.service';
 
 @Component({
   selector: 'app-feed',
-  imports: [ReactiveFormsModule, RouterLink, NgClass,DatePipe],
   templateUrl: './feed.component.html',
   styleUrl: './feed.component.css',
+  imports: [AccountCardComponent, DashboardHeaderComponent, TransactionHistoryComponent, TransferModalComponent]
 })
-
-
-
 export class FeedComponent implements OnInit {
 
-  account: Account = {
-    user: { id: 0, username: '', password: '' },
-    accountNumber: '',
-    balance: 0
-  };
+  account!: Account;
   transactions: Transaction[] = [];
 
   showModal = false;
+  isLoading = true;
   isTransferring = false;
 
-  // loading screen state
-  isLoading = true;
-
-  transferForm: FormGroup;
+  transferForm!: FormGroup;
 
   constructor(
     private fb: FormBuilder,
@@ -44,131 +33,94 @@ export class FeedComponent implements OnInit {
     private transferService: TransferService,
     private accService: AccServiceService,
     private cd: ChangeDetectorRef
-  ) {
+  ) {}
+
+  ngOnInit(): void {
+    this.initForm();
+    this.loadAccountData();
+    this.loadTransactions();
+  }
+
+  initForm() {
     this.transferForm = this.fb.group({
       recipientAccountNumber: ['', Validators.required],
       amount: [null, [Validators.required, Validators.min(1)]]
     });
   }
 
-
-  ngOnInit(): void {
-    this.loadAccountData();
-    this.loadTransactions();
-
-  }
-
-  loadTransactions(): void {
-
-    this.transferService.transaction().subscribe({
-
-      next: (data: any) => {
-
-        this.transactions = data;
-
-        console.log("Transactions:", this.transactions);
-
-        this.cd.detectChanges();
-
-      },
-
-      error: (err) => {
-
-        console.error("Error loading transactions", err);
-
-      }
-
-    });
-
-  }
-
-
-  loadAccountData(): void {
-
-    this.isLoading = true;
+  loadAccountData() {
 
     this.accService.getAcc().subscribe({
-
-      next: (data: any) => {
-
-        this.account = { ...data };
-
-
-        console.log("API response:", this.account);
-
+      next: (data:any) => {
+        this.account = data;
         this.cd.detectChanges();
-
         this.isLoading = false;
+
+
       },
-
-      error: (err) => {
-
-        console.error('Session expired or invalid', err);
-
-        this.isLoading = false;
-
+      error: () => {
         this.logout();
       }
     });
+
   }
 
-  handleTransfer(): void {
+  loadTransactions() {
+
+    this.transferService.transaction().subscribe({
+      next: (data:any) => {
+        this.transactions = data;
+        this.cd.detectChanges();
+      }
+    });
+
+  }
+
+  handleTransfer() {
 
     if (this.transferForm.invalid) return;
+
     const amount = this.transferForm.value.amount;
 
     if (amount > this.account.balance) {
-
-      alert("❌ Insufficient balance!");
-
+      alert("Insufficient balance");
       return;
     }
 
     this.isTransferring = true;
 
-    this.transferService.transfer(this.transferForm.value)
-      .subscribe({
+    this.transferService.transfer(this.transferForm.value).subscribe({
 
-        next: () => {
+      next: () => {
 
-          // refresh account balance immediately
-
-
-
+        this.transferForm.reset();
+        this.showModal = false;
+        this.isTransferring = false;
 
 
-          this.isTransferring = false;
+        this.loadAccountData();
+        this.loadTransactions();
+        this.cd.detectChanges();
 
-          this.transferForm.reset();
-
-          this.showModal = false;
-
-          this.loadAccountData();
-          this.loadTransactions();
-
-          setTimeout(() => {
-            alert('Transfer Successful!');
-          }, 0);
-          this.cd.detectChanges();
+        alert("Transfer Successful!");
 
 
-        },
+      },
 
-        error: (err) => {
+      error: (err) => {
 
-          console.error(err);
+        this.isTransferring = false;
+        alert(err?.error || 'Transfer Failed');
 
-          this.isTransferring = false;
+      }
 
-          alert(err?.error || 'Transfer Failed');
+    });
 
-        }
-
-      });
   }
 
-  logout(): void {
+  logout() {
     localStorage.removeItem('token');
     this.router.navigate(['/login']);
   }
+
 }

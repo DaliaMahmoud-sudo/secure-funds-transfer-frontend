@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from "@angular/router";
 import { AuthService } from '../../core/auth/services/auth/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -14,11 +14,12 @@ export class RegisterComponent {
 
   private readonly authService=inject(AuthService);
   private readonly router=inject(Router);
-  registerForm: FormGroup = new FormGroup({
-    username: new FormControl("", [Validators.required , Validators.minLength(3) , Validators.maxLength(20)]),
-    password: new FormControl("", [Validators.required , Validators.pattern(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/)])
-  });
+  private readonly fb= inject(FormBuilder);
 
+  registerForm: FormGroup = this.fb.nonNullable.group({
+    username: ["", [Validators.required]],
+    password: ["", [Validators.required ]]
+  });
   errorMsg:string="";
   loading:boolean=false;
   registersubscribe: Subscription=new Subscription();

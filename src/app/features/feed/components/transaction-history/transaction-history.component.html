@@ -1,0 +1,82 @@
+
+  @if(transactions.length > 0){
+
+  <div class="overflow-x-auto">
+
+    <table class="w-full text-sm text-left">
+
+      <thead class="text-gray-500 border-b">
+
+        <tr>
+
+          <th class="py-3">Type</th>
+
+          <th class="py-3">From</th>
+
+          <th class="py-3">To</th>
+
+          <th class="py-3">Amount</th>
+
+          <th class="py-3">Date</th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        @for(transaction of transactions; track transaction.id){
+
+        <tr class="border-b hover:bg-gray-50">
+
+          <td class="py-3">
+
+            <span
+              class="px-3 py-1 rounded-full text-xs font-bold"
+              [ngClass]="{
+                'bg-red-100 text-red-600': transaction.type === 'OUT',
+                'bg-green-100 text-green-600': transaction.type === 'IN'
+              }">
+
+              {{ transaction.type }}
+
+            </span>
+
+          </td>
+
+          <td class="py-3 font-mono">
+            {{ transaction.senderAccountNumber }}
+          </td>
+
+          <td class="py-3 font-mono">
+            {{ transaction.recipientAccountNumber }}
+          </td>
+
+          <td class="py-3 font-bold">
+
+            <span
+              [ngClass]="{
+                'text-red-600': transaction.type === 'OUT',
+                'text-green-600': transaction.type === 'IN'
+              }">
+
+              {{ transaction.type === 'OUT' ? '-' : '+' }}${{ transaction.amount }}
+
+            </span>
+
+          </td>
+
+          <td class="py-3 text-gray-400">
+            {{ transaction.transactionDate | date:'short' }}
+          </td>
+
+        </tr>
+
+        }
+      </tbody>
+
+    </table>
+
+  </div>
+
+  }

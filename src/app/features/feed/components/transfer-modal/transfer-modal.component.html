@@ -1,0 +1,50 @@
+@if(showModal){
+
+<div class="fixed inset-0 bg-black/40 flex items-center justify-center">
+
+  <div class="bg-white p-6 rounded-xl w-full max-w-md">
+
+    <h2 class="text-xl font-bold mb-4">Send Money</h2>
+
+    <form [formGroup]="transferForm" (ngSubmit)="submitTransfer.emit()">
+
+      <input
+        formControlName="recipientAccountNumber"
+        placeholder="Recipient Account"
+        class="w-full border p-3 rounded mb-3"
+      />
+
+      <input
+        type="number"
+        formControlName="amount"
+        placeholder="Amount"
+        class="w-full border p-3 rounded mb-4"
+      />
+
+      <div class="flex justify-end gap-3">
+
+        <button
+          type="button"
+          (click)="close.emit()"
+          class="px-4 py-2 bg-gray-200 rounded">
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          [disabled]="isTransferring"
+          class="px-4 py-2 bg-mainColor text-white rounded">
+
+          Transfer
+
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+}

@@ -1,7 +1,7 @@
 import { Router } from '@angular/router';
 import { Component } from '@angular/core';
 import { inject } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/services/auth/auth.service';
 import { Subscription } from 'rxjs';
@@ -17,9 +17,11 @@ export class LoginComponent {
 
    private readonly authService=inject(AuthService);
   private readonly router=inject(Router);
-  loginForm: FormGroup = new FormGroup({
-    username: new FormControl("", [Validators.required , Validators.minLength(3)]),
-    password: new FormControl("", [Validators.required ])
+  private readonly fb= inject(FormBuilder);
+
+  loginForm: FormGroup = this.fb.nonNullable.group({
+    username: ["", [Validators.required]],
+    password: ["", [Validators.required ]]
   });
 
  errorMsg:string="";
