@@ -1,3 +1,3 @@
 export const environment = {
-  baseUrl: "http://localhost:8080/api",
+  baseUrl: "demo-deployment-production-5e11.up.railway.app/api",
 };

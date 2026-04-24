@@ -23,6 +23,8 @@ export class RegisterComponent {
   errorMsg:string="";
   loading:boolean=false;
   registersubscribe: Subscription=new Subscription();
+
+
   submitForm():void {
 
    if(this.registerForm.valid){
